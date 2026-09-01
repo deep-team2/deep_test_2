@@ -228,7 +228,7 @@ c["진동"] = pd.to_numeric(
     c["진동"],
     errors="coerce",
 )
-temp_fill = c["생산라인"].map(mwo)
+temp_fill = c["생산라인"].map(moo)
 
 c["온도"] = c["온도"].fillna(temp_fill)
 
@@ -516,7 +516,7 @@ batch2_known_scaled_again = scale_data(
 
 print(batch2_known_scaled.equals(batch2_known_scaled_again))
 
-result.to_csv(
+c.to_csv(
     "정제결과_최종.csv",
     index=False,
     encoding="utf-8-sig",

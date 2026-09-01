@@ -10,14 +10,14 @@
 #
 # 필요한 파일: 설비배치1.csv (같은 폴더에 두세요)
 #   검사일시 / 생산라인(A·B·C) / 설비번호 / 온도 / 진동 / 회전수 / 압력 / 판정
- 
+
 import numpy as np
 import pandas as pd
- 
+
 df = pd.read_csv("설비배치1.csv", encoding="utf-8-sig")
 sensor = ["온도", "진동", "회전수", "압력"]
- 
- 
+
+
 # ----------------------------------------
 # 문제 1. 받은 파일을 열고 상태를 파악한다
 # ----------------------------------------
@@ -27,7 +27,7 @@ sensor = ["온도", "진동", "회전수", "압력"]
 #            {'온도': 6, '압력': 3}
 #            str
 #            {'정상': 119, '주의': 62, '이상': 5}
-print("1번답","="*60)
+print("1번답", "=" * 60)
 print(df.shape)
 isna_count = df.isna().sum()
 print(isna_count[isna_count > 0])
@@ -45,13 +45,15 @@ print(value_count)
 # 기대 출력: 3
 #            4.19
 
-print("2번답","="*60)
+print("2번답", "=" * 60)
 
-df["진동"] = pd.to_numeric(df["진동"],errors="coerce") # pd.to_numeric 을 사용하면 숫자로 바꾼다.못바꾸면 결측으로 판정
+df["진동"] = pd.to_numeric(
+    df["진동"], errors="coerce"
+)  # pd.to_numeric 을 사용하면 숫자로 바꾼다.못바꾸면 결측으로 판정
 
 print(df["진동"].isna().sum())
 
-print(round(df["진동"].mean(),2))
+print(round(df["진동"].mean(), 2))
 
 # ----------------------------------------
 # 문제 3. 중복 행 제거
@@ -60,16 +62,17 @@ print(round(df["진동"].mean(),2))
 # 인덱스는 0부터 다시 매깁니다.
 # 기대 출력: 4
 #            (182, 8)
-print("3번답","="*60)
+print("3번답", "=" * 60)
 
 print(df.duplicated().sum())
-df = df.drop_duplicates().reset_index(drop=True)   # duplicated 중복값을 알려주는 함수고, 앞에 drop_을 붙이면 중복값을 떨궈준다. 
-print(df.shape)                                    # .reset_index(drop=True) 를 붙이면 떨군 후 빈자리가 있을테니까 그걸 떙겨준다. 
+df = df.drop_duplicates().reset_index(
+    drop=True
+)  # duplicated 중복값을 알려주는 함수고, 앞에 drop_을 붙이면 중복값을 떨궈준다.
+print(
+    df.shape
+)  # .reset_index(drop=True) 를 붙이면 떨군 후 빈자리가 있을테니까 그걸 떙겨준다.
 
 
-
- 
- 
 # ----------------------------------------
 # 문제 4. 결측 채우기
 # ----------------------------------------
@@ -80,7 +83,7 @@ print(df.shape)                                    # .reset_index(drop=True) 를
 # 기대 출력: 0
 #            84.4 5.48
 
-print("4번답","="*60)
+print("4번답", "=" * 60)
 
 temp_avg = df["온도"].mean()
 press_med = df["압력"].median()
@@ -92,12 +95,9 @@ df["진동"] = df["진동"].fillna(vib_avg)
 
 print(df[sensor].isna().sum().sum())
 
-print(round(temp_avg,2),round(press_med,2))
+print(round(temp_avg, 2), round(press_med, 2))
 
 
-
-
- 
 # ----------------------------------------
 # 문제 5. 생산라인별 요약
 # ----------------------------------------
@@ -109,15 +109,13 @@ print(round(temp_avg,2),round(press_med,2))
 #            B라인   84.88  4.19  1601.74  5.49
 #            C라인   94.40  5.38  1751.33  7.08
 #            {'A라인': 60, 'B라인': 62, 'C라인': 60}
-print("5번답","="*60)
+print("5번답", "=" * 60)
 yoyak = df.groupby("생산라인")[sensor].mean().round(2)
 print(yoyak)
 
 print(df.groupby("생산라인").size().sort_index().to_dict())
 
 
-
- 
 # ----------------------------------------
 # 문제 6. z-점수로 온도 이상 찾기
 # ----------------------------------------
@@ -125,14 +123,13 @@ print(df.groupby("생산라인").size().sort_index().to_dict())
 # 이어서 z-점수 절댓값이 3을 넘는 개수와 2를 넘는 개수를 한 줄에 출력하세요.
 # 기대 출력: 84.4 9.08
 #            0 0
-print("6번답","="*60)
+print("6번답", "=" * 60)
 
-z_score_temp = abs((df["온도"]-df["온도"].mean())/df["온도"].std(ddof=0))
-print(temp_avg.round(2),df["온도"].std(ddof=0).round(2))
-print((z_score_temp > 3).sum(),(z_score_temp > 2).sum())
+z_score_temp = abs((df["온도"] - df["온도"].mean()) / df["온도"].std(ddof=0))
+print(temp_avg.round(2), df["온도"].std(ddof=0).round(2))
+print((z_score_temp > 3).sum(), (z_score_temp > 2).sum())
 
 
- 
 # ----------------------------------------
 # 문제 7. IQR로 압력 이상 찾기
 # ----------------------------------------
@@ -142,25 +139,23 @@ print((z_score_temp > 3).sum(),(z_score_temp > 2).sum())
 # 기대 출력: 0.23 10.56
 #            3
 #            {'C라인': 3}
-print("7번답","="*60)
+print("7번답", "=" * 60)
 
 q1 = df["압력"].quantile(0.25)
 q3 = df["압력"].quantile(0.75)
 iqr = q3 - q1
 aaa = q1 - 1.5 * iqr
 bbb = q3 + 1.5 * iqr
-print(aaa.round(2),bbb.round(2))
+print(aaa.round(2), bbb.round(2))
 
 mask = (aaa > df["압력"]) | (bbb < df["압력"])
 
 print(mask.sum())
 
-print(df.loc[mask,"생산라인"].value_counts().to_dict())
-                                                # df.loc[행조건==마스크,열 이름]
+print(df.loc[mask, "생산라인"].value_counts().to_dict())
+# df.loc[행조건==마스크,열 이름]
 
 
-
- 
 # ----------------------------------------
 # 문제 8. 이상으로 판정된 행 제거
 # ----------------------------------------
@@ -170,18 +165,14 @@ print(df.loc[mask,"생산라인"].value_counts().to_dict())
 # 기대 출력: {'A라인': 60, 'B라인': 62, 'C라인': 60}
 #            {'A라인': 60, 'B라인': 62, 'C라인': 57}
 #            (179, 8)
-print("8번답","="*60)
+print("8번답", "=" * 60)
 
 print(df["생산라인"].value_counts().sort_index().to_dict())
-df = df.loc[~mask].reset_index(drop=True)                       # ~mask == 마스크가 아닌 값
+df = df.loc[~mask].reset_index(drop=True)  # ~mask == 마스크가 아닌 값
 print(df["생산라인"].value_counts().sort_index().to_dict())
 print(df.shape)
 
 
-
-
-
- 
 # ----------------------------------------
 # 문제 9. 0~1로 스케일 맞추고 파일로 남기기
 # ----------------------------------------
@@ -194,24 +185,23 @@ print(df.shape)
 #            {'온도': 1.0, '진동': 1.0, '회전수': 1.0, '압력': 1.0}
 #            {'온도': 0.529, '진동': 0.494, '회전수': 0.495, '압력': 0.39}
 #            (179, 6)
-print("9번답","="*60)
+print("9번답", "=" * 60)
 
 low = df[sensor].min()
 high = df[sensor].max()
 
-df_scaled = (df[sensor] -low) / (high - low)
+df_scaled = (df[sensor] - low) / (high - low)
 print(df_scaled.min().round(3).to_dict())
 print(df_scaled.max().round(3).to_dict())
 print(df_scaled.mean().round(3).to_dict())
 
-result = df[["검사일시","생산라인"]].copy()
+result = df[["검사일시", "생산라인"]].copy()
 
 result[sensor] = df_scaled.round(4)
-result.to_csv("정규화_멘티.csv",index=False,encoding="utf-8-sig")
+result.to_csv("정규화_멘티.csv", index=False, encoding="utf-8-sig")
 
 qqq = pd.read_csv("정규화_멘티.csv")
-print(qqq.shape) 
-
+print(qqq.shape)
 
 
 # ----------------------------------------
@@ -226,7 +216,15 @@ print(qqq.shape)
 # 기대 출력: (179, 8) 0 0
 #            ['검사일시', '생산라인', '라인코드', '온도', '진동', '회전수', '압력', '판정']
 
-print("9번답","="*60)
+print("10번답", "=" * 60)
 
-map = {"A라인":0,"B라인":1,"C라인":2} 
-print(map)
+map_line = {"A라인": 0, "B라인": 1, "C라인": 2}
+df["라인코드"] = df["생산라인"].map(map_line)
+ppp = ["검사일시", "생산라인", "라인코드", "온도", "진동", "회전수", "압력", "판정"]
+kkk = df[ppp].copy()
+
+kkk.to_csv("정제결과_멘티.csv",index=False,encoding="utf-8-sig")
+kkk_csv = pd.read_csv("정제결과_멘티.csv", encoding="utf-8-sig")
+
+print(kkk_csv.shape,kkk_csv.isna().sum().sum(),kkk_csv.duplicated().sum())
+print(kkk_csv.columns.to_list())

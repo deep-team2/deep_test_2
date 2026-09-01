@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 
 df = pd.read_csv("로그배치1.csv", encoding="utf-8-sig")
-지표 = ["CPU온도", "전력", "응답시간", "메모리"]
+jipyo = ["CPU온도", "전력", "응답시간", "메모리"]
 
 
 # ----------------------------------------
@@ -30,7 +30,14 @@ df = pd.read_csv("로그배치1.csv", encoding="utf-8-sig")
 #            {'CPU온도': 6, '메모리': 3}
 #            str
 #            {'정상': 125, '경고': 56, '장애': 5}
+print("1번 답","="*80)
 
+print(df.shape)
+isna_count = df.isna().sum()
+print(isna_count[isna_count > 0].to_dict())
+print(type(df["전력"].iloc[0]).__name__)
+value_count = df["상태"].value_counts().to_dict()
+print(value_count)
 
 # ----------------------------------------
 # 문제 2. 숫자로 저장되지 않은 열 고치기
@@ -41,6 +48,10 @@ df = pd.read_csv("로그배치1.csv", encoding="utf-8-sig")
 #       오류 대신 결측으로 만들어 주는 옵션이 있습니다. 그 옵션을 찾아보세요.
 # 기대 출력: 3
 #            164.42
+print("2번 답","="*80)
+df["전력"] = pd.to_numeric(df["전력"],errors="coerce")
+print(df["전력"].isna().sum())
+print(df["전력"].mean().round(2))
 
 
 # ----------------------------------------
@@ -53,6 +64,10 @@ df = pd.read_csv("로그배치1.csv", encoding="utf-8-sig")
 # 기대 출력: 4
 #            (182, 8)
 
+print("3번 답","="*80)
+print(df.duplicated().sum())
+df_no_jungbok = df.drop_duplicates(jipyo)
+print(df_no_jungbok.shape)
 
 # ----------------------------------------
 # 문제 4. 결측 채우기
@@ -65,7 +80,14 @@ df = pd.read_csv("로그배치1.csv", encoding="utf-8-sig")
 #       메서드는 결측을 알아서 빼고 계산하니 먼저 구해 두고 채우면 됩니다.
 # 기대 출력: 0
 #            68.38 29.78
+print("4번 답","="*80)
 
+df["CPU온도"]=df["CPU온도"].fillna(df["CPU온도"].mean())
+df["메모리"]=df["메모리"].fillna(df["메모리"].median())
+df["전력"]=df["전력"].fillna(df["전력"].mean())
+print(df[jipyo].isna().sum().sum())
+print(df["CPU온도"].mean().round(2))
+print(df["메모리"].median().round(2))
 
 # ----------------------------------------
 # 문제 5. 구역별 요약
@@ -81,6 +103,14 @@ df = pd.read_csv("로그배치1.csv", encoding="utf-8-sig")
 #            Z3-찰리   77.59  208.04  195.30  41.11
 #            {'Z1-알파': 60, 'Z2-브라보': 62, 'Z3-찰리': 60}
 
+print("5번 답","="*80)
+print(df.groupby("구역")[jipyo].mean().round(2)) 
+area_count = df["구역"].value_counts().to_dict()
+print(area_count)
+
+
+
+
 
 # ----------------------------------------
 # 문제 6. z-점수로 CPU온도 이상 찾기
@@ -91,6 +121,11 @@ df = pd.read_csv("로그배치1.csv", encoding="utf-8-sig")
 #       조건을 만족하는 개수는 True/False 시리즈의 합으로 셀 수 있습니다.
 # 기대 출력: 68.38 7.86
 #            0 0
+
+print(df["CPU온도"].mean().round(2),df["CPU온도"].std(ddof=0).round(2))
+
+
+
 
 
 # ----------------------------------------
